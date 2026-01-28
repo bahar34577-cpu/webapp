@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WA Bot Panel - WhatsApp Bot Services</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+</head>
+<body>
+    <!-- Skeleton Loading -->
+    <div id="skeleton-loader" class="skeleton-loader">
+        <div class="skeleton-content">
+            <div class="skeleton-logo"></div>
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Halaman Login -->
+    <section id="login-page" class="page active">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <h1>WA Bot Panel</h1>
+                </div>
+                <p class="tagline">Panel Management Bot WhatsApp Terbaik</p>
+            </div>
+            
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="login-identifier">Email atau Nomor WhatsApp</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="login-identifier" placeholder="email@domain.com atau 62812..." required>
+                    </div>
+                    <div class="input-hint">Format email atau nomor WhatsApp (min 10 digit)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="Minimal 6 karakter" required>
+                        <button type="button" class="toggle-password" id="toggle-login-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-primary btn-login">
+                    <span class="btn-text">Masuk ke Akun</span>
+                    <div class="btn-loader hidden">
+                        <div class="loader"></div>
+                    </div>
+                </button>
+                
+                <div class="form-footer">
+                    <p>Belum punya akun? <a href="#/register" class="link">Daftar Sekarang</a></p>
+                    <p class="demo-info">Demo: gunakan email demo@demo.com / password: 123456</p>
+                </div>
+            </form>
+            
+            <div class="login-features">
+                <div class="feature">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Akun Terproteksi</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-bolt"></i>
+                    <span>Akses Cepat</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-headset"></i>
+                    <span>Support 24/7</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Halaman Daftar -->
+    <section id="register-page" class="page">
+        <div class="register-container">
+            <div class="register-header">
+                <button class="back-btn" onclick="window.location.hash = '#/login'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Buat Akun Baru</h2>
+                <p>Daftar untuk mulai menggunakan layanan bot WhatsApp</p>
+            </div>
+            
+            <form id="register-form" class="register-form">
+                <div class="form-group">
+                    <label for="register-name">Nama Lengkap</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user-circle"></i>
+                        <input type="text" id="register-name" placeholder="Masukkan nama lengkap" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="register-email" placeholder="email@domain.com" required>
+                    </div>
+                    <div class="input-hint">Email akan digunakan untuk verifikasi akun</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-phone">Nomor WhatsApp</label>
+                    <div class="input-with-icon">
+                        <i class="fab fa-whatsapp"></i>
+                        <input type="tel" id="register-phone" placeholder="62812..." pattern="[0-9]{10,15}" required>
+                    </div>
+                    <div class="input-hint">Nomor aktif WhatsApp (10-15 digit)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="register-password" placeholder="Minimal 6 karakter" required>
+                        <button type="button" class="toggle-password" id="toggle-register-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-confirm-password">Konfirmasi Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="register-confirm-password" placeholder="Ulangi password" required>
+                        <button type="button" class="toggle-password" id="toggle-register-confirm-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-primary btn-register">
+                    <span class="btn-text">Daftar Sekarang</span>
+                    <div class="btn-loader hidden">
+                        <div class="loader"></div>
+                    </div>
+                </button>
+                
+                <div class="form-footer">
+                    <p>Sudah punya akun? <a href="#/login" class="link">Masuk di sini</a></p>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Halaman Beranda -->
+    <section id="home-page" class="page">
+        <div class="home-container">
+            <!-- Top Bar dengan efek glassmorphism -->
+            <header class="home-header">
+                <div class="user-greeting">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <h1 id="home-username">Hello, User</h1>
+                        <div class="user-details">
+                            <span id="home-email" class="user-detail"><i class="fas fa-envelope"></i> user@email.com</span>
+                            <span id="home-phone" class="user-detail"><i class="fab fa-whatsapp"></i> 62812...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Status & Saldo Card -->
+            <div class="status-card">
+                <div class="status-info">
+                    <div class="status-badge" id="status-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Verified</span>
+                    </div>
+                    <div class="saldo-info">
+                        <p>Saldo Tersedia</p>
+                        <h2 id="saldo-amount">Rp 0</h2>
+                    </div>
+                </div>
+                <div class="status-actions">
+                    <button class="btn-small btn-outline" onclick="window.location.hash = '#/deposit'">
+                        <i class="fas fa-plus-circle"></i> Deposit
+                    </button>
+                    <button class="btn-small btn-primary" onclick="window.location.hash = '#/transaksi'">
+                        <i class="fas fa-history"></i> Riwayat
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Banner Promosi Slider -->
+            <div class="banner-slider">
+                <div class="slider-container">
+                    <div class="slider-track">
+                        <!-- Banner akan di-generate oleh JavaScript -->
+                    </div>
+                </div>
+                <div class="slider-dots">
+                    <!-- Dots akan di-generate oleh JavaScript -->
+                </div>
+                <button class="slider-btn prev-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="slider-btn next-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <!-- Menu Produk -->
+            <div class="products-section">
+                <div class="section-header">
+                    <h3>Panel Bot WhatsApp</h3>
+                    <p>Pilih kapasitas yang sesuai kebutuhan Anda</p>
+                </div>
+                
+                <div class="products-grid" id="products-grid">
+                    <!-- Produk akan di-generate oleh JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Menu Layanan -->
+            <div class="services-section">
+                <div class="section-header">
+                    <h3>Layanan Lainnya</h3>
+                    <p>Pilih layanan tambahan untuk bot WhatsApp Anda</p>
+                </div>
+                
+                <div class="services-grid" id="services-grid">
+                    <!-- Layanan akan di-generate oleh JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#/home" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Beranda</span>
+            </a>
+            <a href="#/transaksi" class="nav-item">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Transaksi</span>
+            </a>
+            <a href="#/deposit" class="nav-item">
+                <i class="fas fa-wallet"></i>
+                <span>Deposit</span>
+            </a>
+            <a href="#/akun" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Akun</span>
+            </a>
+        </nav>
+    </section>
+
+    <!-- Halaman Transaksi -->
+    <section id="transaksi-page" class="page">
+        <div class="transaksi-container">
+            <header class="page-header">
+                <button class="back-btn" onclick="window.location.hash = '#/home'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Riwayat Transaksi</h2>
+                <div class="header-actions">
+                    <button class="icon-btn filter-btn" id="filter-btn">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Filter Transaksi -->
+            <div class="filter-container hidden" id="filter-container">
+                <div class="filter-options">
+                    <button class="filter-option active" data-filter="all">Semua</button>
+                    <button class="filter-option" data-filter="paid">Berhasil</button>
+                    <button class="filter-option" data-filter="pending">Pending</button>
+                    <button class="filter-option" data-filter="failed">Gagal</button>
+                </div>
+            </div>
+            
+            <!-- Daftar Transaksi -->
+            <div class="transactions-list" id="transactions-list">
+                <!-- Transaksi akan di-generate oleh JavaScript -->
+            </div>
+            
+            <div class="empty-state hidden" id="empty-transactions">
+                <div class="empty-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <h3>Belum ada transaksi</h3>
+                <p>Transaksi yang Anda lakukan akan muncul di sini</p>
+                <button class="btn-primary" onclick="window.location.hash = '#/home'">
+                    <i class="fas fa-shopping-cart"></i> Beli Produk
+                </button>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#/home" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Beranda</span>
+            </a>
+            <a href="#/transaksi" class="nav-item active">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Transaksi</span>
+            </a>
+            <a href="#/deposit" class="nav-item">
+                <i class="fas fa-wallet"></i>
+                <span>Deposit</span>
+            </a>
+            <a href="#/akun" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Akun</span>
+            </a>
+        </nav>
+    </section>
+
+    <!-- Halaman Deposit -->
+    <section id="deposit-page" class="page">
+        <div class="deposit-container">
+            <header class="page-header">
+                <button class="back-btn" onclick="window.location.hash = '#/home'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Deposit Saldo</h2>
+            </header>
+            
+            <div class="deposit-card">
+                <div class="deposit-info">
+                    <div class="current-saldo">
+                        <p>Saldo Saat Ini</p>
+                        <h2 id="current-saldo">Rp 0</h2>
+                    </div>
+                    <div class="deposit-method">
+                        <div class="method-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <div class="method-info">
+                            <h4>QRIS Otomatis</h4>
+                            <p>Deposit cepat via QRIS - otomatis dalam 2 menit</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="deposit-form">
+                    <div class="form-group">
+                        <label for="deposit-amount">Jumlah Deposit</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <input type="number" id="deposit-amount" placeholder="Masukkan jumlah (min Rp 10.000)" min="10000" required>
+                        </div>
+                        <div class="amount-presets">
+                            <button class="amount-preset" data-amount="10000">10K</button>
+                            <button class="amount-preset" data-amount="50000">50K</button>
+                            <button class="amount-preset" data-amount="100000">100K</button>
+                            <button class="amount-preset" data-amount="200000">200K</button>
+                        </div>
+                    </div>
+                    
+                    <div class="deposit-summary">
+                        <div class="summary-item">
+                            <span>Jumlah Deposit</span>
+                            <span id="summary-amount">Rp 0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Biaya Admin</span>
+                            <span id="summary-fee">Rp 0</span>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-item total">
+                            <span>Total Dibayar</span>
+                            <span id="summary-total">Rp 0</span>
+                        </div>
+                    </div>
+                    
+                    <button id="btn-generate-qris" class="btn-primary btn-generate-qris">
+                        <i class="fas fa-qrcode"></i>
+                        <span class="btn-text">Generate QRIS</span>
+                        <div class="btn-loader hidden">
+                            <div class="loader"></div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- QRIS Display -->
+            <div class="qris-container hidden" id="qris-container">
+                <div class="qris-header">
+                    <h3>Scan QRIS untuk Deposit</h3>
+                    <p>Saldo akan masuk otomatis dalam 2 menit setelah pembayaran</p>
+                </div>
+                
+                <div class="qris-display">
+                    <div class="qris-code" id="qris-code">
+                        <!-- QR Code akan digenerate -->
+                        <div class="qris-placeholder">
+                            <i class="fas fa-qrcode"></i>
+                            <p>QRIS akan muncul di sini</p>
+                        </div>
+                    </div>
+                    <div class="qris-info">
+                        <div class="qris-amount">
+                            <p>Jumlah Pembayaran</p>
+                            <h2 id="qris-amount">Rp 0</h2>
+                        </div>
+                        <div class="qris-timer">
+                            <p>QRIS berlaku hingga</p>
+                            <h3 id="qris-timer">05:00</h3>
+                        </div>
+                        <p class="qris-note">Scan QRIS menggunakan aplikasi bank atau e-wallet Anda</p>
+                    </div>
+                </div>
+                
+                <div class="qris-actions">
+                    <button id="btn-check-payment" class="btn-primary">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Cek Status Pembayaran</span>
+                    </button>
+                    <button id="btn-cancel-deposit" class="btn-outline">
+                        <i class="fas fa-times"></i>
+                        <span>Batalkan Deposit</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Riwayat Deposit -->
+            <div class="deposit-history">
+                <div class="section-header">
+                    <h3>Riwayat Deposit</h3>
+                </div>
+                
+                <div class="deposit-history-list" id="deposit-history-list">
+                    <!-- Riwayat deposit akan di-generate oleh JavaScript -->
+                </div>
+                
+                <div class="empty-state hidden" id="empty-deposit-history">
+                    <div class="empty-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3>Belum ada riwayat deposit</h3>
+                    <p>Deposit Anda akan muncul di sini</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#/home" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Beranda</span>
+            </a>
+            <a href="#/transaksi" class="nav-item">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Transaksi</span>
+            </a>
+            <a href="#/deposit" class="nav-item active">
+                <i class="fas fa-wallet"></i>
+                <span>Deposit</span>
+            </a>
+            <a href="#/akun" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Akun</span>
+            </a>
+        </nav>
+    </section>
+
+    <!-- Halaman Akun -->
+    <section id="akun-page" class="page">
+        <div class="akun-container">
+            <header class="page-header">
+                <button class="back-btn" onclick="window.location.hash = '#/home'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Akun Saya</h2>
+            </header>
+            
+            <!-- Profil User -->
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="profile-name">Nama User</h2>
+                        <div class="profile-status">
+                            <div class="verification-badge" id="verification-badge">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Email Terverifikasi</span>
+                            </div>
+                            <span class="member-since">Member sejak <span id="member-since">2024</span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="detail-content">
+                            <p class="detail-label">Email</p>
+                            <p class="detail-value" id="profile-email">user@email.com</p>
+                        </div>
+                        <div class="detail-action">
+                            <span class="verified-status verified" id="email-verified">
+                                <i class="fas fa-check-circle"></i> Terverifikasi
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="detail-content">
+                            <p class="detail-label">Nomor WhatsApp</p>
+                            <p class="detail-value" id="profile-phone">62812...</p>
+                        </div>
+                        <div class="detail-action">
+                            <span class="verified-status unverified" id="phone-verified">
+                                <i class="fas fa-exclamation-circle"></i> Belum Verifikasi
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="detail-content">
+                            <p class="detail-label">Saldo Tersedia</p>
+                            <p class="detail-value saldo" id="profile-saldo">Rp 0</p>
+                        </div>
+                        <div class="detail-action">
+                            <button class="btn-tiny" onclick="window.location.hash = '#/deposit'">
+                                <i class="fas fa-plus"></i> Topup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Menu Akun -->
+            <div class="account-menu">
+                <div class="menu-section">
+                    <h3>Pengaturan</h3>
+                    <div class="menu-list">
+                        <a href="#" class="menu-item" id="btn-edit-profile">
+                            <div class="menu-icon">
+                                <i class="fas fa-user-edit"></i>
+                            </div>
+                            <div class="menu-text">
+                                <p>Edit Profil</p>
+                                <span>Ubah informasi pribadi</span>
+                            </div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="#" class="menu-item" id="btn-verify-phone">
+                            <div class="menu-icon">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div class="menu-text">
+                                <p>Verifikasi Nomor WhatsApp</p>
+                                <span>Dapatkan akses penuh</span>
+                            </div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="#" class="menu-item" id="btn-security">
+                            <div class="menu-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="menu-text">
+                                <p>Keamanan Akun</p>
+                                <span>Ubah password, dll</span>
+                            </div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="menu-section">
+                    <h3>Lainnya</h3>
+                    <div class="menu-list">
+                        <a href="#" class="menu-item">
+                            <div class="menu-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="menu-text">
+                                <p>Bantuan & Dukungan</p>
+                                <span>Pusat bantuan dan FAQ</span>
+                            </div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="#" class="menu-item">
+                            <div class="menu-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="menu-text">
+                                <p>Syarat & Ketentuan</p>
+                                <span>Kebijakan penggunaan layanan</span>
+                            </div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="#" class="menu-item" id="btn-logout">
+                            <div class="menu-icon logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </div>
+                            <div class="menu-text">
+                                <p>Keluar Akun</p>
+                                <span>Logout dari perangkat ini</span>
+                            </div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#/home" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Beranda</span>
+            </a>
+            <a href="#/transaksi" class="nav-item">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Transaksi</span>
+            </a>
+            <a href="#/deposit" class="nav-item">
+                <i class="fas fa-wallet"></i>
+                <span>Deposit</span>
+            </a>
+            <a href="#/akun" class="nav-item active">
+                <i class="fas fa-user"></i>
+                <span>Akun</span>
+            </a>
+        </nav>
+    </section>
+
+    <!-- Halaman Produk & Checkout -->
+    <section id="produk-page" class="page">
+        <div class="produk-container">
+            <header class="page-header">
+                <button class="back-btn" id="back-from-produk">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2 id="produk-title">Detail Produk</h2>
+            </header>
+            
+            <div class="produk-detail" id="produk-detail">
+                <!-- Detail produk akan diisi oleh JavaScript -->
+            </div>
+            
+            <!-- Tombol Checkout -->
+            <div class="checkout-footer">
+                <div class="price-summary">
+                    <p>Total Pembayaran</p>
+                    <h2 id="checkout-total">Rp 0</h2>
+                </div>
+                <button class="btn-primary btn-checkout" id="btn-checkout">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Lanjut ke Pembayaran</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Halaman Payment -->
+    <section id="payment-page" class="page">
+        <div class="payment-container">
+            <header class="page-header">
+                <button class="back-btn" id="back-from-payment">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Konfirmasi Pembayaran</h2>
+            </header>
+            
+            <div class="payment-content">
+                <!-- Ringkasan Pembayaran -->
+                <div class="payment-summary">
+                    <h3>Ringkasan Pembelian</h3>
+                    <div class="summary-item">
+                        <span id="payment-product-name">Produk</span>
+                        <span id="payment-product-price">Rp 0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Biaya Admin</span>
+                        <span id="payment-fee">Rp 0</span>
+                    </div>
+                    <div class="summary-divider"></div>
+                    <div class="summary-item total">
+                        <span>Total</span>
+                        <span id="payment-total">Rp 0</span>
+                    </div>
+                </div>
+                
+                <!-- Metode Pembayaran -->
+                <div class="payment-method">
+                    <h3>Metode Pembayaran</h3>
+                    <div class="method-selected">
+                        <div class="method-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="method-info">
+                            <h4>Saldo WA Bot Panel</h4>
+                            <p>Saldo tersedia: <span id="payment-available-saldo">Rp 0</span></p>
+                        </div>
+                        <div class="method-check">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Konfirmasi Swipe -->
+                <div class="swipe-confirmation">
+                    <div class="swipe-instruction">
+                        <i class="fas fa-hand-point-up"></i>
+                        <p>Geser untuk mengonfirmasi pembelian</p>
+                    </div>
+                    
+                    <div class="swipe-container">
+                        <div class="swipe-track">
+                            <div class="swipe-thumb" id="swipe-thumb">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                            <div class="swipe-text" id="swipe-text">
+                                <span>Geser ke kanan untuk bayar</span>
+                            </div>
+                            <div class="swipe-progress" id="swipe-progress"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-note">
+                        <p><i class="fas fa-info-circle"></i> Dengan menggeser, Anda menyetujui pembelian ini</p>
+                    </div>
+                </div>
+                
+                <!-- Status Pembayaran -->
+                <div class="payment-status hidden" id="payment-status">
+                    <!-- Status akan diisi saat pembayaran berhasil/gagal -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal Edit Profil -->
+    <div class="modal-overlay hidden" id="edit-profile-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Edit Profil</h3>
+                <button class="modal-close" id="close-edit-profile">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-profile-form">
+                    <div class="form-group">
+                        <label for="edit-name">Nama Lengkap</label>
+                        <input type="text" id="edit-name" placeholder="Nama lengkap" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-phone">Nomor WhatsApp</label>
+                        <input type="tel" id="edit-phone" placeholder="62812..." pattern="[0-9]{10,15}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-password">Password Baru (opsional)</label>
+                        <input type="password" id="edit-password" placeholder="Kosongkan jika tidak ingin mengubah">
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-outline" id="cancel-edit-profile">Batal</button>
+                        <button type="submit" class="btn-primary">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Verifikasi WhatsApp -->
+    <div class="modal-overlay hidden" id="verify-phone-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Verifikasi Nomor WhatsApp</h3>
+                <button class="modal-close" id="close-verify-phone">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="verification-steps">
+                    <div class="step active">
+                        <div class="step-number">1</div>
+                        <div class="step-info">
+                            <h4>Kirim Kode Verifikasi</h4>
+                            <p>Kami akan mengirim kode OTP ke WhatsApp Anda</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-info">
+                            <h4>Masukkan Kode</h4>
+                            <p>Masukkan kode OTP yang diterima</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-info">
+                            <h4>Verifikasi Selesai</h4>
+                            <p>Nomor WhatsApp Anda akan terverifikasi</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="verification-form">
+                    <div class="form-group">
+                        <label for="verification-phone">Nomor WhatsApp</label>
+                        <input type="tel" id="verification-phone" placeholder="62812..." disabled>
+                    </div>
+                    
+                    <button class="btn-primary" id="btn-send-otp">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>Kirim Kode OTP via WhatsApp</span>
+                    </button>
+                    
+                    <div class="otp-input hidden" id="otp-input">
+                        <label for="verification-otp">Kode OTP</label>
+                        <div class="otp-container">
+                            <input type="text" id="otp-1" maxlength="1">
+                            <input type="text" id="otp-2" maxlength="1">
+                            <input type="text" id="otp-3" maxlength="1">
+                            <input type="text" id="otp-4" maxlength="1">
+                            <input type="text" id="otp-5" maxlength="1">
+                            <input type="text" id="otp-6" maxlength="1">
+                        </div>
+                        <div class="otp-timer">
+                            <p>Kode berlaku selama <span id="otp-timer">05:00</span></p>
+                        </div>
+                        <button class="btn-primary" id="btn-verify-otp">
+                            <i class="fas fa-check"></i>
+                            <span>Verifikasi Kode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Keamanan -->
+    <div class="modal-overlay hidden" id="security-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Keamanan Akun</h3>
+                <button class="modal-close" id="close-security">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="security-form">
+                    <div class="form-group">
+                        <label for="current-password">Password Saat Ini</label>
+                        <input type="password" id="current-password" placeholder="Masukkan password saat ini" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="new-password">Password Baru</label>
+                        <input type="password" id="new-password" placeholder="Minimal 6 karakter" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm-new-password">Konfirmasi Password Baru</label>
+                        <input type="password" id="confirm-new-password" placeholder="Ulangi password baru" required>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-outline" id="cancel-security">Batal</button>
+                        <button type="submit" class="btn-primary">Ubah Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confetti Animation -->
+    <div id="confetti-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
