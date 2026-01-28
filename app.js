@@ -1,6 +1,6 @@
-// WA Bot Panel - Main Application
+// WA Bot Panel - Main Application dengan Integrasi API Pakasir
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('WA Bot Panel loaded');
+    console.log('WA Bot Panel dengan API Pakasir loaded');
     
     // Initialize the application
     initApp();
@@ -25,6 +25,15 @@ let isSwiping = false;
 let products = [];
 let services = [];
 let banners = [];
+
+// Konfigurasi API Pakasir
+const PAKASIR_CONFIG = {
+    API_KEY: 'ES4mWVwOTQC5zp1TYheedHcJlgt4bq7o', // API Key yang Anda berikan
+    PROJECT_SLUG: 'YOUR_PROJECT_SLUG_HERE', // Ganti dengan project slug Anda
+    API_BASE_URL: 'https://app.pakasir.com/api',
+    CREATE_QRIS_ENDPOINT: '/transactioncreate/qris',
+    CHECK_STATUS_ENDPOINT: '/transactiondetail'
+};
 
 // Initialize the application
 function initApp() {
@@ -557,16 +566,16 @@ function setupEventListeners() {
         });
     });
 
-    // Generate QRIS button
+    // Generate QRIS button (Pakasir API)
     const generateQrisBtn = document.getElementById('btn-generate-qris');
     if (generateQrisBtn) {
-        generateQrisBtn.addEventListener('click', generateQRIS);
+        generateQrisBtn.addEventListener('click', generateQRISWithPakasir);
     }
 
     // Check payment button
     const checkPaymentBtn = document.getElementById('btn-check-payment');
     if (checkPaymentBtn) {
-        checkPaymentBtn.addEventListener('click', checkPaymentStatus);
+        checkPaymentBtn.addEventListener('click', checkPaymentStatusWithPakasir);
     }
 
     // Cancel deposit button
@@ -644,8 +653,6 @@ function setupEventListeners() {
     // Swipe to confirm
     const swipeThumb = document.getElementById('swipe-thumb');
     const swipeTrack = document.querySelector('.swipe-track');
-    const swipeText = document.getElementById('swipe-text');
-    const swipeProgress = document.getElementById('swipe-progress');
     
     if (swipeThumb && swipeTrack) {
         // Touch events for mobile
@@ -1801,69 +1808,189 @@ function updateDepositSummary() {
     summaryTotal.textContent = formatCurrency(total);
 }
 
-function generateQRIS() {
+// ============================================
+// FUNGSI API PAKASIR YANG SUDAH DIINTEGRASI
+// ============================================
+
+/**
+ * Generate QRIS menggunakan API Pakasir
+ * Menggantikan fungsi simulasi sebelumnya
+ */
+async function generateQRISWithPakasir() {
     const amountInput = document.getElementById('deposit-amount');
     const qrisContainer = document.getElementById('qris-container');
     const generateBtn = document.getElementById('btn-generate-qris');
     const qrisAmount = document.getElementById('qris-amount');
+    const qrisCode = document.getElementById('qris-code');
+    const qrisOrderId = document.getElementById('qris-order-id');
     
-    if (!amountInput || !qrisContainer || !generateBtn || !qrisAmount) return;
+    if (!amountInput || !qrisContainer || !generateBtn || !qrisAmount || !qrisCode) return;
     
     const amount = parseInt(amountInput.value) || 0;
-    
     if (amount < 10000) {
         showToast('Minimum deposit adalah Rp 10.000', 'error');
         return;
     }
     
-    // Show loading
+    // 1. Show loading state
     generateBtn.classList.add('loading');
+    const btnText = generateBtn.querySelector('.btn-text');
+    if (btnText) btnText.textContent = 'Membuat QRIS...';
     
-    // Simulate API call to generate QRIS
-    setTimeout(() => {
-        // Calculate fee (2% with minimum 1000)
-        const fee = Math.max(1000, Math.round(amount * 0.02));
-        const total = amount + fee;
+    // 2. Generate a unique order ID for this transaction
+    const orderId = 'DEP' + Date.now() + Math.floor(Math.random() * 1000);
+    
+    // 3. Calculate fee (2% with minimum 1000)
+    const fee = Math.max(1000, Math.round(amount * 0.02));
+    const total = amount + fee;
+    
+    // 4. Prepare the request to Pakasir API
+    const requestData = {
+        project: PAKASIR_CONFIG.PROJECT_SLUG, // Ganti dengan project slug Anda
+        order_id: orderId,
+        amount: amount,
+        api_key: PAKASIR_CONFIG.API_KEY // API Key yang Anda berikan
+    };
+    
+    try {
+        console.log('Mengirim request ke API Pakasir:', requestData);
         
-        // Update QRIS display
-        qrisAmount.textContent = formatCurrency(total);
-        
-        // Generate QR code placeholder
-        const qrisCode = document.getElementById('qris-code');
-        if (qrisCode) {
-            qrisCode.innerHTML = `
-                <div class="qris-placeholder">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">🧾</div>
-                    <p>QRIS Deposit</p>
-                    <p style="font-size: 1.25rem; font-weight: 600; margin-top: 0.5rem;">${formatCurrency(total)}</p>
-                    <p style="font-size: 0.75rem; margin-top: 0.5rem;">ID: DEP${Date.now().toString().substr(-6)}</p>
-                </div>
-            `;
+        // 5. Make the API call to create a QRIS transaction
+        const response = await fetch(PAKASIR_CONFIG.API_BASE_URL + PAKASIR_CONFIG.CREATE_QRIS_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        const result = await response.json();
+        console.log('Response dari Pakasir:', result);
+
+        if (response.ok && result.payment) {
+            // 6. Success! Display the QRIS data
+            const payment = result.payment;
+            
+            // Display the total amount (amount + fee)
+            qrisAmount.textContent = formatCurrency(total);
+            
+            // Display order ID
+            if (qrisOrderId) qrisOrderId.textContent = orderId;
+            
+            // 7. Generate and display QR Code from the `payment_number` string
+            qrisCode.innerHTML = `<div id="qr-code-image"></div>`;
+            
+            // Clear any existing QR code
+            if (window.qrCodeInstance) {
+                window.qrCodeInstance.clear();
+            }
+            
+            // Create new QR code
+            window.qrCodeInstance = new QRCode(document.getElementById("qr-code-image"), {
+                text: payment.payment_number || payment.qr_string || `https://qr.example.com/${orderId}`,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            // 8. Save transaction details for status checking
+            const depositData = {
+                orderId: orderId,
+                amount: amount,
+                fee: fee,
+                total: total,
+                expiredAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+                qrisContent: payment.payment_number || payment.qr_string,
+                transactionData: payment
+            };
+            localStorage.setItem('pendingDeposit', JSON.stringify(depositData));
+            
+            // 9. Show QRIS container and start timer
+            qrisContainer.classList.remove('hidden');
+            startDepositTimer(5 * 60); // 5 minutes
+            
+            showToast('QRIS berhasil dibuat via Pakasir. Scan untuk melakukan pembayaran.', 'success');
+        } else {
+            // Handle API error
+            const errorMsg = result.message || result.error || 'Unknown error';
+            console.error('Pakasir API error:', errorMsg);
+            showToast('Gagal membuat QRIS: ' + errorMsg, 'error');
         }
-        
-        // Show QRIS container
-        qrisContainer.classList.remove('hidden');
-        
-        // Hide loading
+    } catch (error) {
+        // Handle network error
+        console.error('Generate QRIS error:', error);
+        showToast('Network error. Silakan coba lagi.', 'error');
+    } finally {
+        // 10. Hide loading state
         generateBtn.classList.remove('loading');
-        
-        // Start timer (5 minutes)
-        startDepositTimer(5 * 60);
-        
-        // Save deposit session
-        depositExpiry = new Date(Date.now() + 5 * 60 * 1000);
-        localStorage.setItem('depositSession', JSON.stringify({
-            amount: amount,
-            fee: fee,
-            total: total,
-            expiry: depositExpiry.toISOString(),
-            id: 'DEP' + Date.now().toString().substr(-6)
-        }));
-        
-        showToast('QRIS berhasil digenerate. Scan untuk melakukan pembayaran.', 'success');
-    }, 1500);
+        if (btnText) btnText.textContent = 'Generate QRIS via Pakasir';
+    }
 }
 
+/**
+ * Check payment status menggunakan API Pakasir
+ * Menggantikan fungsi simulasi sebelumnya
+ */
+async function checkPaymentStatusWithPakasir() {
+    const checkBtn = document.getElementById('btn-check-payment');
+    if (!checkBtn) return;
+
+    // Get saved transaction data
+    const pendingDeposit = JSON.parse(localStorage.getItem('pendingDeposit'));
+    if (!pendingDeposit) {
+        showToast('Tidak ada data transaksi ditemukan', 'error');
+        return;
+    }
+
+    // Show loading
+    checkBtn.classList.add('loading');
+    const btnText = checkBtn.querySelector('span');
+    if (btnText) btnText.textContent = 'Memeriksa...';
+
+    try {
+        // 1. Call Pakasir Transaction Detail API
+        const apiUrl = `${PAKASIR_CONFIG.API_BASE_URL}${PAKASIR_CONFIG.CHECK_STATUS_ENDPOINT}?project=${PAKASIR_CONFIG.PROJECT_SLUG}&order_id=${pendingDeposit.orderId}&amount=${pendingDeposit.amount}&api_key=${PAKASIR_CONFIG.API_KEY}`;
+        
+        console.log('Checking payment status:', apiUrl);
+        const response = await fetch(apiUrl);
+        const result = await response.json();
+        console.log('Status response:', result);
+
+        if (response.ok && result.transaction) {
+            const transaction = result.transaction;
+            
+            if (transaction.status === 'completed' || transaction.status === 'success') {
+                // Payment successful!
+                showToast('Pembayaran berhasil! Memproses deposit...', 'success');
+                processSuccessfulDeposit(pendingDeposit);
+            } else if (transaction.status === 'pending') {
+                showToast('Pembayaran masih pending. Silakan scan QRIS.', 'info');
+            } else if (transaction.status === 'expired') {
+                showToast('QRIS telah kadaluarsa. Silakan generate ulang.', 'warning');
+                // Hide QRIS container
+                const qrisContainer = document.getElementById('qris-container');
+                if (qrisContainer) qrisContainer.classList.add('hidden');
+            } else {
+                showToast('Status pembayaran: ' + transaction.status, 'warning');
+            }
+        } else {
+            // Handle case where transaction not found (might still be pending)
+            const errorMsg = result.message || 'Transaksi belum ditemukan';
+            showToast(errorMsg + '. Silakan coba lagi nanti.', 'info');
+        }
+    } catch (error) {
+        console.error('Check payment error:', error);
+        showToast('Network error saat cek status', 'error');
+    } finally {
+        // Hide loading
+        checkBtn.classList.remove('loading');
+        if (btnText) btnText.textContent = 'Cek Status Pembayaran';
+    }
+}
+
+// Timer functions (remain the same)
 function startDepositTimer(seconds) {
     const timerElement = document.getElementById('qris-timer');
     if (!timerElement) return;
@@ -1871,6 +1998,11 @@ function startDepositTimer(seconds) {
     let remaining = seconds;
     
     updateTimerDisplay(remaining, timerElement);
+    
+    // Clear existing timer
+    if (depositTimer) {
+        clearInterval(depositTimer);
+    }
     
     depositTimer = setInterval(() => {
         remaining--;
@@ -1895,129 +2027,114 @@ function updateTimerDisplay(seconds, element) {
     element.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-function checkPaymentStatus() {
-    const checkBtn = document.getElementById('btn-check-payment');
-    if (!checkBtn) return;
-    
-    // Show loading
-    checkBtn.classList.add('loading');
-    
-    // Simulate checking payment status
-    setTimeout(() => {
-        // 70% chance of success
-        const isSuccess = Math.random() < 0.7;
-        
-        if (isSuccess) {
-            // Process successful payment
-            processSuccessfulDeposit();
-        } else {
-            showToast('Pembayaran belum diterima. Silakan coba lagi nanti.', 'warning');
-        }
-        
-        // Hide loading
-        checkBtn.classList.remove('loading');
-    }, 2000);
-}
-
-function processSuccessfulDeposit() {
-    // Get deposit session
-    const depositSession = JSON.parse(localStorage.getItem('depositSession'));
-    if (!depositSession) {
-        showToast('Sesi deposit tidak ditemukan', 'error');
+/**
+ * Process successful deposit (after payment confirmed)
+ */
+function processSuccessfulDeposit(pendingDeposit) {
+    if (!pendingDeposit || !currentUser) {
+        showToast('Data deposit tidak valid', 'error');
         return;
     }
     
-    // Check if expired
-    if (new Date(depositSession.expiry) < new Date()) {
-        showToast('QRIS telah kadaluarsa. Silakan generate ulang.', 'warning');
-        return;
+    // 1. Update user balance
+    currentUser.balance += pendingDeposit.amount;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    // 2. Create deposit record
+    const depositId = pendingDeposit.orderId || 'DEP' + Date.now().toString().substr(-6);
+    const deposit = {
+        id: depositId,
+        userId: currentUser.id,
+        amount: pendingDeposit.amount,
+        fee: pendingDeposit.fee || 0,
+        total: pendingDeposit.total || pendingDeposit.amount,
+        date: new Date().toISOString().replace('T', ' ').substr(0, 19),
+        status: 'success',
+        method: 'QRIS (Pakasir)',
+        orderId: pendingDeposit.orderId
+    };
+    
+    // 3. Save deposit history
+    const deposits = JSON.parse(localStorage.getItem('deposits')) || [];
+    deposits.push(deposit);
+    localStorage.setItem('deposits', JSON.stringify(deposits));
+    
+    // 4. Create transaction record
+    const transaction = {
+        id: depositId,
+        userId: currentUser.id,
+        productId: null,
+        productName: 'Deposit Saldo via Pakasir',
+        date: new Date().toISOString().replace('T', ' ').substr(0, 19),
+        amount: pendingDeposit.amount,
+        status: 'paid',
+        type: 'deposit'
+    };
+    
+    // 5. Save transaction
+    const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    transactions.push(transaction);
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+    
+    // 6. Clear deposit session
+    localStorage.removeItem('pendingDeposit');
+    
+    // 7. Clear timer
+    if (depositTimer) {
+        clearInterval(depositTimer);
+        depositTimer = null;
     }
     
-    // Update user balance
-    if (currentUser) {
-        currentUser.balance += depositSession.amount;
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        
-        // Create deposit record
-        const deposit = {
-            id: depositSession.id,
-            userId: currentUser.id,
-            amount: depositSession.amount,
-            fee: depositSession.fee,
-            total: depositSession.total,
-            date: new Date().toISOString().replace('T', ' ').substr(0, 19),
-            status: 'success',
-            method: 'QRIS'
-        };
-        
-        // Save deposit
-        const deposits = JSON.parse(localStorage.getItem('deposits')) || [];
-        deposits.push(deposit);
-        localStorage.setItem('deposits', JSON.stringify(deposits));
-        
-        // Create transaction record
-        const transaction = {
-            id: depositSession.id,
-            userId: currentUser.id,
-            productId: null,
-            productName: 'Deposit Saldo',
-            date: new Date().toISOString().replace('T', ' ').substr(0, 19),
-            amount: depositSession.amount,
-            status: 'paid',
-            type: 'deposit'
-        };
-        
-        // Save transaction
-        const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-        transactions.push(transaction);
-        localStorage.setItem('transactions', JSON.stringify(transactions));
-        
-        // Clear deposit session
-        localStorage.removeItem('depositSession');
-        
-        // Clear timer
-        if (depositTimer) {
-            clearInterval(depositTimer);
-        }
-        
-        // Hide QRIS container
-        const qrisContainer = document.getElementById('qris-container');
-        if (qrisContainer) {
-            qrisContainer.classList.add('hidden');
-        }
-        
-        // Update UI
-        updateUIForLoggedInUser();
-        loadDepositHistory();
-        
-        // Update current balance on deposit page
-        const currentSaldo = document.getElementById('current-saldo');
-        if (currentSaldo) {
-            currentSaldo.textContent = formatCurrency(currentUser.balance);
-        }
-        
-        // Show success message with animation
-        showToast('Deposit berhasil! Saldo telah ditambahkan.', 'success');
-        
-        // Create flying paper animation
-        createFlyingPaperAnimation();
+    // 8. Hide QRIS container
+    const qrisContainer = document.getElementById('qris-container');
+    if (qrisContainer) {
+        qrisContainer.classList.add('hidden');
+    }
+    
+    // 9. Update UI
+    updateUIForLoggedInUser();
+    loadDepositHistory();
+    
+    // 10. Update current balance on deposit page
+    const currentSaldo = document.getElementById('current-saldo');
+    if (currentSaldo) {
+        currentSaldo.textContent = formatCurrency(currentUser.balance);
+    }
+    
+    // 11. Show success message with animation
+    showToast('Deposit berhasil! Saldo telah ditambahkan.', 'success');
+    
+    // 12. Create flying paper animation
+    createFlyingPaperAnimation();
+    
+    // 13. Clear QR code
+    if (window.qrCodeInstance) {
+        window.qrCodeInstance.clear();
+        window.qrCodeInstance = null;
     }
 }
 
 function cancelDeposit() {
     if (confirm('Batalkan deposit? QRIS akan dinonaktifkan.')) {
         // Clear deposit session
-        localStorage.removeItem('depositSession');
+        localStorage.removeItem('pendingDeposit');
         
         // Clear timer
         if (depositTimer) {
             clearInterval(depositTimer);
+            depositTimer = null;
         }
         
         // Hide QRIS container
         const qrisContainer = document.getElementById('qris-container');
         if (qrisContainer) {
             qrisContainer.classList.add('hidden');
+        }
+        
+        // Clear QR code
+        if (window.qrCodeInstance) {
+            window.qrCodeInstance.clear();
+            window.qrCodeInstance = null;
         }
         
         showToast('Deposit dibatalkan', 'info');
