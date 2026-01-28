@@ -1,6 +1,6 @@
-# WA Bot Panel - WhatsApp Bot Services
+# WA Bot Panel - WhatsApp Bot Services dengan API Pakasir
 
-Website panel management bot WhatsApp dengan fitur lengkap dan modern.
+Website panel management bot WhatsApp dengan fitur lengkap dan integrasi API QRIS Pakasir.
 
 ## Fitur Utama
 
@@ -27,10 +27,10 @@ Website panel management bot WhatsApp dengan fitur lengkap dan modern.
    - Animasi pembayaran berhasil/gagal
    - Riwayat transaksi
 
-5. **Deposit Saldo**
-   - Deposit via QRIS otomatis
-   - Timer countdown untuk QRIS
-   - Cek status pembayaran otomatis
+5. **Deposit Saldo dengan API Pakasir**
+   - Deposit via QRIS menggunakan API Pakasir
+   - Generate QRIS langsung dari API
+   - Cek status pembayaran real-time
    - Riwayat deposit
 
 6. **Manajemen Akun**
@@ -47,11 +47,29 @@ Website panel management bot WhatsApp dengan fitur lengkap dan modern.
 - LocalStorage untuk penyimpanan data
 - Font Awesome untuk ikon
 - Google Fonts (Poppins, Inter)
+- QRCode.js untuk generate QR Code
+- **API Pakasir untuk transaksi QRIS**
+
+## Konfigurasi API Pakasir
+
+1. **Ganti Project Slug**:
+   - Buka file `app.js`
+   - Cari `PAKASIR_CONFIG.PROJECT_SLUG`
+   - Ganti `'YOUR_PROJECT_SLUG_HERE'` dengan slug proyek Anda dari Pakasir
+
+2. **API Key**:
+   - API Key sudah diatur: `ES4mWVwOTQC5zp1TYheedHcJlgt4bq7o`
+   - Key ini sudah terintegrasi di kode
+
+3. **Endpoint API Pakasir**:
+   - Create QRIS: `https://app.pakasir.com/api/transactioncreate/qris`
+   - Check Status: `https://app.pakasir.com/api/transactiondetail`
 
 ## Cara Menjalankan
 
 1. **Lokal**
    - Download semua file (index.html, style.css, app.js)
+   - Pastikan ada koneksi internet untuk load library
    - Buka file index.html di browser
    - Atau gunakan live server extension di VS Code
 
@@ -63,30 +81,9 @@ Website panel management bot WhatsApp dengan fitur lengkap dan modern.
 
 1. **Produk**
    - Edit array `products` di fungsi `initData()` di app.js
-   - Format:
-     ```javascript
-     {
-       id: 1,
-       name: "Nama Produk",
-       category: "Kategori",
-       price: 10000,
-       description: "Deskripsi produk",
-       features: ["Fitur 1", "Fitur 2"],
-       isFeatured: false
-     }
-     ```
 
 2. **Banner Promosi**
    - Edit array `banners` di fungsi `initData()` di app.js
-   - Format:
-     ```javascript
-     {
-       id: 1,
-       title: "Judul Banner",
-       description: "Deskripsi banner",
-       color: "gradient-1" // gradient-1 sampai gradient-4
-     }
-     ```
 
 3. **Layanan**
    - Edit array `services` di fungsi `initData()` di app.js
