@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
 </head>
 <body>
@@ -356,7 +358,7 @@
                             <i class="fas fa-qrcode"></i>
                         </div>
                         <div class="method-info">
-                            <h4>QRIS Otomatis</h4>
+                            <h4>QRIS Otomatis via Pakasir</h4>
                             <p>Deposit cepat via QRIS - otomatis dalam 2 menit</p>
                         </div>
                     </div>
@@ -370,10 +372,10 @@
                             <input type="number" id="deposit-amount" placeholder="Masukkan jumlah (min Rp 10.000)" min="10000" required>
                         </div>
                         <div class="amount-presets">
-                            <button class="amount-preset" data-amount="10000">10K</button>
-                            <button class="amount-preset" data-amount="50000">50K</button>
-                            <button class="amount-preset" data-amount="100000">100K</button>
-                            <button class="amount-preset" data-amount="200000">200K</button>
+                            <button type="button" class="amount-preset" data-amount="10000">10K</button>
+                            <button type="button" class="amount-preset" data-amount="50000">50K</button>
+                            <button type="button" class="amount-preset" data-amount="100000">100K</button>
+                            <button type="button" class="amount-preset" data-amount="200000">200K</button>
                         </div>
                     </div>
                     
@@ -393,13 +395,17 @@
                         </div>
                     </div>
                     
-                    <button id="btn-generate-qris" class="btn-primary btn-generate-qris">
+                    <button type="button" id="btn-generate-qris" class="btn-primary btn-generate-qris">
                         <i class="fas fa-qrcode"></i>
-                        <span class="btn-text">Generate QRIS</span>
+                        <span class="btn-text">Generate QRIS via Pakasir</span>
                         <div class="btn-loader hidden">
                             <div class="loader"></div>
                         </div>
                     </button>
+                    
+                    <div class="api-note">
+                        <p><i class="fas fa-info-circle"></i> Menggunakan API Pakasir untuk transaksi QRIS nyata</p>
+                    </div>
                 </div>
             </div>
             
@@ -412,7 +418,7 @@
                 
                 <div class="qris-display">
                     <div class="qris-code" id="qris-code">
-                        <!-- QR Code akan digenerate -->
+                        <!-- QR Code akan digenerate oleh API Pakasir -->
                         <div class="qris-placeholder">
                             <i class="fas fa-qrcode"></i>
                             <p>QRIS akan muncul di sini</p>
@@ -427,16 +433,19 @@
                             <p>QRIS berlaku hingga</p>
                             <h3 id="qris-timer">05:00</h3>
                         </div>
+                        <div class="qris-order">
+                            <p>Order ID: <span id="qris-order-id">-</span></p>
+                        </div>
                         <p class="qris-note">Scan QRIS menggunakan aplikasi bank atau e-wallet Anda</p>
                     </div>
                 </div>
                 
                 <div class="qris-actions">
-                    <button id="btn-check-payment" class="btn-primary">
+                    <button type="button" id="btn-check-payment" class="btn-primary">
                         <i class="fas fa-sync-alt"></i>
                         <span>Cek Status Pembayaran</span>
                     </button>
-                    <button id="btn-cancel-deposit" class="btn-outline">
+                    <button type="button" id="btn-cancel-deposit" class="btn-outline">
                         <i class="fas fa-times"></i>
                         <span>Batalkan Deposit</span>
                     </button>
